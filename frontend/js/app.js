@@ -2,7 +2,7 @@ const getApiBaseUrl = () => {
     const url = new URL(window.location.href);
     let path = url.pathname;
 
-    // Remove o nome do arquivo se presente (ex: index.html ou historico.html)
+    // Remove o nome do arquivo se presente (ex: index.html)
     if (path.includes('.html')) {
         path = path.substring(0, path.lastIndexOf('/'));
     }
