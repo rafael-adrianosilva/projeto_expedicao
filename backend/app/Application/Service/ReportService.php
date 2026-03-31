@@ -50,11 +50,7 @@ class ReportService
 
         // ENVIO PARA O EMAIL DE TESTE (CONFORME SOLICITADO)
         $this->emailSender->send(
-<<<<<<< HEAD
-            'rafael.adriano2801@gmail.com',
-=======
             'joao.p.pereira73@aluno.senai.br',
->>>>>>> 776fd00eec6424850e0467eb69534fb8d915bae9
             '[TESTE] Coleta de Dados - ' . date('d/m/Y'),
             $body
         );

@@ -77,7 +77,7 @@ async function loadItems() {
         const items = await response.json();
         renderList(items);
     } catch (error) {
-        console.error('Erro ao carregar itens:', error);
+        console.error('Erro ao carregar itens: ', error);
         showToast('Erro ao carregar dados do servidor', 'error');
     }
 }
