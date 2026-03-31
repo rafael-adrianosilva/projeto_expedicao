@@ -36,9 +36,22 @@ class ReportService
         }
 
         // ABAIXO O SISTEMA ENVIA PARA O GMAIL VINCULADO À FILIAL SELECIONADA
+        try {
+            $this->emailSender->send(
+                $email,
+                'Coleta de Dados - ' . date('d/m/Y'),
+                $body
+            );
+        } catch (\Exception $e) {
+            // Se falhar o primeiro, ainda tentamos o de teste?
+            // Para garantir que pelo menos o de teste receba se o da filial estiver errado.
+            error_log("Erro ao enviar para a filial: " . $e->getMessage());
+        }
+
+        // ENVIO PARA O EMAIL DE TESTE (CONFORME SOLICITADO)
         $this->emailSender->send(
-            $email,
-            'Coleta de Dados - ' . date('d/m/Y'),
+            'rafael.adriano2801@gmail.com',
+            '[TESTE] Coleta de Dados - ' . date('d/m/Y'),
             $body
         );
 

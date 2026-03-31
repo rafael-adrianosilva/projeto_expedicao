@@ -2,7 +2,7 @@ const getApiBaseUrl = () => {
     const url = new URL(window.location.href);
     let path = url.pathname;
 
-    // Remove o nome do arquivo se presente (ex: index.html ou historico.html)
+    // Remove o nome do arquivo se presente (ex: index.html)
     if (path.includes('.html')) {
         path = path.substring(0, path.lastIndexOf('/'));
     }
@@ -348,7 +348,7 @@ function setScanMode(mode) {
         if (btnModeQR) btnModeQR.classList.remove('active');
         if (modeSlider) modeSlider.style.transform = 'translateX(100%)';
     }
-    
+
     // Se a câmera já estiver rodando, reiniciamos ela com as novas configurações
     if (html5QrCode && html5QrCode.isScanning) {
         startCamera();
@@ -391,15 +391,15 @@ async function startCamera() {
         qrbox: isQRCode ? { width: 250, height: 250 } : { width: 300, height: 150 },
         aspectRatio: 1.0,
         disableFlip: false,
-        formatsToSupport: isQRCode 
-            ? [ Html5QrcodeSupportedFormats.QR_CODE ] 
-            : [ 
-                Html5QrcodeSupportedFormats.CODE_128, 
+        formatsToSupport: isQRCode
+            ? [Html5QrcodeSupportedFormats.QR_CODE]
+            : [
+                Html5QrcodeSupportedFormats.CODE_128,
                 Html5QrcodeSupportedFormats.CODE_39,
                 Html5QrcodeSupportedFormats.EAN_13,
                 Html5QrcodeSupportedFormats.EAN_8,
                 Html5QrcodeSupportedFormats.UPC_A
-              ]
+            ]
     };
 
     const onSuccess = (decodedText) => {
@@ -559,33 +559,8 @@ if (btnConfirmClear) {
 // --- Dados das Filiais Fachini ---
 // ABAIXO VOCÊ PODE ALTERAR O E-MAIL DE CADA FILIAL. 
 // Certifique-se de manter o formato { name: '...', location: '...', state: '...', email: '...' }
-const branches = [
-    { name: 'Votuporanga – SP (Sede)', location: 'Votuporanga, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José do Rio Preto – SP', location: 'São José do Rio Preto, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Mirassol – SP', location: 'Mirassol, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cosmorama – SP', location: 'Cosmorama, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Coroados – SP', location: 'Coroados, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Ribeirão Preto – SP', location: 'Ribeirão Preto, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Guararema – SP', location: 'Guararema, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Guarulhos – SP', location: 'Guarulhos, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Anápolis – GO', location: 'Anápolis, GO', state: 'GO', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Rio Verde – GO', location: 'Rio Verde, GO', state: 'GO', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cuiabá – MT', location: 'Cuiabá, MT', state: 'MT', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Rondonópolis – MT', location: 'Rondonópolis, MT', state: 'MT', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Campo Grande – MS', location: 'Campo Grande, MS', state: 'MS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Ribas do Rio Pardo – MS', location: 'Ribas do Rio Pardo, MS', state: 'MS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Chapecó – SC', location: 'Chapecó, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Penha – SC', location: 'Penha, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Içara – SC', location: 'Içara, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José dos Pinhais – PR', location: 'São José dos Pinhais, PR', state: 'PR', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cambé – PR', location: 'Cambé, PR', state: 'PR', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Nova Santa Rita – RS', location: 'Nova Santa Rita, RS', state: 'RS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Imperatriz – MA', location: 'Imperatriz, MA', state: 'MA', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José de Mipibu – RN', location: 'São José de Mipibu, RN', state: 'RN', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cabo de Santo Agostinho – PE', location: 'Cabo de Santo Agostinho, PE', state: 'PE', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Luís Eduardo Magalhães – BA', location: 'Luís Eduardo Magalhães, BA', state: 'BA', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Palmas – TO', location: 'Palmas, TO', state: 'TO', email: 'arthur.tadeu.carvalhoo@gmail.com' }
-];
+// --- Dados das Filiais Fachini ---
+// (Lista de filiais e selectedBranchEmail movidos para config.js por questões de privacidade)
 
 // Elementos dos Modais de Destino
 const destinationModal = document.getElementById('destinationModal');
@@ -618,12 +593,10 @@ window.filterByState = (state) => {
     renderBranchList();
 };
 
-let selectedBranchEmail = null;
-
 window.selectBranch = (branchName) => {
     const branch = branches.find(b => b.name === branchName);
     destinationInput.value = branchName;
-    selectedBranchEmail = branch ? branch.email : null;
+    selectedBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
 
     btnConfirmSend.disabled = false;
     btnConfirmSend.style.opacity = '1';
