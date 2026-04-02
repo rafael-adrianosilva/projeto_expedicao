@@ -22,7 +22,7 @@ class PHPMailerEmailSender implements EmailSender
         $this->username = getenv('SMTP_USER') ?: '';
         $this->password = getenv('SMTP_PASS') ?: '';
         $this->fromEmail = getenv('MAIL_FROM') ?: '';
-        $this->fromName = getenv('MAIL_NAME') ?: 'Fachini Data Collection';
+        $this->fromName = getenv('MAIL_NAME') ?: 'Facchini Data Collection';
     }
 
     public function send(string $to, string $subject, string $body): void

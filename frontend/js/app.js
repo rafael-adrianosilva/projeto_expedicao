@@ -2,7 +2,7 @@ const getApiBaseUrl = () => {
     const url = new URL(window.location.href);
     let path = url.pathname;
 
-    // Remove o nome do arquivo se presente (ex: index.html ou historico.html)
+    // Remove o nome do arquivo se presente (ex: index.html)
     if (path.includes('.html')) {
         path = path.substring(0, path.lastIndexOf('/'));
     }
@@ -77,7 +77,7 @@ async function loadItems() {
         const items = await response.json();
         renderList(items);
     } catch (error) {
-        console.error('Erro ao carregar itens:', error);
+        console.error('Erro ao carregar itens: ', error);
         showToast('Erro ao carregar dados do servidor', 'error');
     }
 }
@@ -339,16 +339,20 @@ let currentScanMode = 'QR';
 
 function setScanMode(mode) {
     currentScanMode = mode;
+    const scanArea = document.getElementById('scanArea');
+    
     if (mode === 'QR') {
         if (btnModeQR) btnModeQR.classList.add('active');
         if (btnModeBarcode) btnModeBarcode.classList.remove('active');
         if (modeSlider) modeSlider.style.transform = 'translateX(0)';
+        if (scanArea) scanArea.classList.remove('barcode-mode');
     } else {
         if (btnModeBarcode) btnModeBarcode.classList.add('active');
         if (btnModeQR) btnModeQR.classList.remove('active');
         if (modeSlider) modeSlider.style.transform = 'translateX(100%)';
+        if (scanArea) scanArea.classList.add('barcode-mode');
     }
-    
+
     // Se a câmera já estiver rodando, reiniciamos ela com as novas configurações
     if (html5QrCode && html5QrCode.isScanning) {
         startCamera();
@@ -387,19 +391,36 @@ async function startCamera() {
     // Configuração baseada no modo selecionado
     const isQRCode = currentScanMode === 'QR';
     const config = {
-        fps: 10,
-        qrbox: isQRCode ? { width: 250, height: 250 } : { width: 300, height: 150 },
-        aspectRatio: 1.0,
+        fps: 25, // Aumentado para maior fluidez
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+            const isLandscape = viewfinderWidth > viewfinderHeight;
+
+            if (isQRCode) {
+                // QR: 70% da menor dimensão em retrato, ou 60% da altura em paisagem
+                const factor = isLandscape ? 0.6 : 0.7;
+                const size = Math.floor(minEdgeSize * factor);
+                return { width: size, height: size };
+            } else {
+                // Barcode: Mais largo que alto
+                const widthFactor = isLandscape ? 0.7 : 0.85;
+                const width = Math.floor(viewfinderWidth * widthFactor);
+                const height = Math.floor(viewfinderHeight * (isLandscape ? 0.25 : 0.3));
+                const finalHeight = Math.max(height, 80); 
+                return { width: width, height: finalHeight };
+            }
+        },
+        aspectRatio: undefined,
         disableFlip: false,
-        formatsToSupport: isQRCode 
-            ? [ Html5QrcodeSupportedFormats.QR_CODE ] 
-            : [ 
-                Html5QrcodeSupportedFormats.CODE_128, 
+        formatsToSupport: isQRCode
+            ? [Html5QrcodeSupportedFormats.QR_CODE]
+            : [
+                Html5QrcodeSupportedFormats.CODE_128,
                 Html5QrcodeSupportedFormats.CODE_39,
                 Html5QrcodeSupportedFormats.EAN_13,
                 Html5QrcodeSupportedFormats.EAN_8,
                 Html5QrcodeSupportedFormats.UPC_A
-              ]
+            ]
     };
 
     const onSuccess = (decodedText) => {
@@ -486,6 +507,18 @@ if (btnSwitchCamera) {
     });
 }
 
+// listener para redimensionamento e orientação - Garante que a "parte branca" volte
+let resizeTimer;
+window.addEventListener('resize', () => {
+    if (cameraModal && cameraModal.style.display === 'flex') {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(async () => {
+            console.log("Redimensionamento detectado, reiniciando scanner...");
+            await startCamera();
+        }, 500); // 500ms de debounce para esperar a rotação terminar
+    }
+});
+
 
 // --- Lógica da Sidebar ---
 function openSidebar() {
@@ -556,48 +589,37 @@ if (btnConfirmClear) {
     });
 }
 
-// --- Dados das Filiais Fachini ---
+// --- Dados das Filiais Facchini ---
 // ABAIXO VOCÊ PODE ALTERAR O E-MAIL DE CADA FILIAL. 
 // Certifique-se de manter o formato { name: '...', location: '...', state: '...', email: '...' }
-const branches = [
-    { name: 'Votuporanga – SP (Sede)', location: 'Votuporanga, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José do Rio Preto – SP', location: 'São José do Rio Preto, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Mirassol – SP', location: 'Mirassol, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cosmorama – SP', location: 'Cosmorama, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Coroados – SP', location: 'Coroados, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Ribeirão Preto – SP', location: 'Ribeirão Preto, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Guararema – SP', location: 'Guararema, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Guarulhos – SP', location: 'Guarulhos, SP', state: 'SP', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Anápolis – GO', location: 'Anápolis, GO', state: 'GO', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Rio Verde – GO', location: 'Rio Verde, GO', state: 'GO', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cuiabá – MT', location: 'Cuiabá, MT', state: 'MT', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Rondonópolis – MT', location: 'Rondonópolis, MT', state: 'MT', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Campo Grande – MS', location: 'Campo Grande, MS', state: 'MS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Ribas do Rio Pardo – MS', location: 'Ribas do Rio Pardo, MS', state: 'MS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Chapecó – SC', location: 'Chapecó, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Penha – SC', location: 'Penha, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Içara – SC', location: 'Içara, SC', state: 'SC', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José dos Pinhais – PR', location: 'São José dos Pinhais, PR', state: 'PR', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cambé – PR', location: 'Cambé, PR', state: 'PR', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Nova Santa Rita – RS', location: 'Nova Santa Rita, RS', state: 'RS', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Imperatriz – MA', location: 'Imperatriz, MA', state: 'MA', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'São José de Mipibu – RN', location: 'São José de Mipibu, RN', state: 'RN', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Cabo de Santo Agostinho – PE', location: 'Cabo de Santo Agostinho, PE', state: 'PE', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Luís Eduardo Magalhães – BA', location: 'Luís Eduardo Magalhães, BA', state: 'BA', email: 'arthur.tadeu.carvalhoo@gmail.com' },
-    { name: 'Palmas – TO', location: 'Palmas, TO', state: 'TO', email: 'arthur.tadeu.carvalhoo@gmail.com' }
-];
+// --- Dados das Filiais Facchini ---
+// (Lista de filiais e selectedBranchEmail movidos para config.js por questões de privacidade)
 
 // Elementos dos Modais de Destino
 const destinationModal = document.getElementById('destinationModal');
 const branchSelectionModal = document.getElementById('branchSelectionModal');
 const fieldSelectBranch = document.getElementById('fieldSelectBranch');
 const destinationInput = document.getElementById('destinationInput');
+const fieldSelectFinalBranch = document.getElementById('fieldSelectFinalBranch');
+const finalDestinationInput = document.getElementById('finalDestinationInput');
 const btnConfirmSend = document.getElementById('btnConfirmSend');
 const btnCancelSend = document.getElementById('btnCancelSend');
 const btnCloseBranchSelection = document.getElementById('btnCloseBranchSelection');
 const branchListContainer = document.getElementById('branchList');
 const filterStatesContainer = document.getElementById('filterStates');
 const branchSearch = document.getElementById('branchSearch');
+
+// Controla qual campo de destino está sendo preenchido ('main' ou 'final')
+let activeDestinationField = 'main';
+
+function checkConfirmButtonState() {
+    const mainFilled = destinationInput && destinationInput.value.trim() !== '';
+    const finalFilled = finalDestinationInput && finalDestinationInput.value.trim() !== '';
+    if (btnConfirmSend) {
+        btnConfirmSend.disabled = !(mainFilled && finalFilled);
+        btnConfirmSend.style.opacity = (mainFilled && finalFilled) ? '1' : '0.5';
+    }
+}
 
 let selectedState = null;
 
@@ -618,16 +640,27 @@ window.filterByState = (state) => {
     renderBranchList();
 };
 
-let selectedBranchEmail = null;
-
 window.selectBranch = (branchName) => {
     const branch = branches.find(b => b.name === branchName);
-    destinationInput.value = branchName;
-    selectedBranchEmail = branch ? branch.email : null;
 
-    btnConfirmSend.disabled = false;
-    btnConfirmSend.style.opacity = '1';
+    if (activeDestinationField === 'final') {
+        if (finalDestinationInput) finalDestinationInput.value = branchName;
+        selectedFinalBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
+        if (fieldSelectFinalBranch) {
+            fieldSelectFinalBranch.style.borderColor = '#1565C0';
+            fieldSelectFinalBranch.style.background = '#e8f0fe';
+        }
+    } else {
+        if (destinationInput) destinationInput.value = branchName;
+        selectedBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
+        if (fieldSelectBranch) {
+            fieldSelectBranch.style.borderColor = 'var(--facchini-orange)';
+            fieldSelectBranch.style.background = '#fff8f0';
+        }
+    }
+
     branchSelectionModal.style.display = 'none';
+    checkConfirmButtonState();
 };
 
 // Função para renderizar lista de filiais
@@ -664,6 +697,35 @@ if (btnSendEmail) {
 
 if (fieldSelectBranch) {
     fieldSelectBranch.addEventListener('click', () => {
+        activeDestinationField = 'main';
+        
+        // Atualiza ícone e título do modal para Destino Normal
+        const modalIcon = document.getElementById('branchModalIcon');
+        const modalTitle = document.getElementById('branchModalTitle');
+        if (modalIcon) modalIcon.setAttribute('data-lucide', 'map-pin');
+        if (modalTitle) modalTitle.textContent = 'Selecionar Filial';
+        lucide.createIcons();
+
+        if (branchSelectionModal) branchSelectionModal.style.display = 'flex';
+        renderFilterStates();
+        renderBranchList();
+    });
+}
+
+if (fieldSelectFinalBranch) {
+    fieldSelectFinalBranch.addEventListener('click', () => {
+        activeDestinationField = 'final';
+        
+        // Atualiza ícone e título do modal para Destino Final
+        const modalIcon = document.getElementById('branchModalIcon');
+        const modalTitle = document.getElementById('branchModalTitle');
+        if (modalIcon) {
+            modalIcon.setAttribute('data-lucide', 'flag');
+            modalIcon.style.color = '#1565C0'; // Azul
+        }
+        if (modalTitle) modalTitle.textContent = 'Selecionar Destino Final';
+        lucide.createIcons();
+
         if (branchSelectionModal) branchSelectionModal.style.display = 'flex';
         renderFilterStates();
         renderBranchList();
@@ -680,6 +742,9 @@ if (btnCancelSend) {
     btnCancelSend.addEventListener('click', () => {
         if (destinationModal) destinationModal.style.display = 'none';
         if (destinationInput) destinationInput.value = '';
+        if (finalDestinationInput) finalDestinationInput.value = '';
+        if (fieldSelectBranch) { fieldSelectBranch.style.borderColor = '#eee'; fieldSelectBranch.style.background = '#fafafa'; }
+        if (fieldSelectFinalBranch) { fieldSelectFinalBranch.style.borderColor = '#eee'; fieldSelectFinalBranch.style.background = '#fafafa'; }
         if (btnConfirmSend) {
             btnConfirmSend.disabled = true;
             btnConfirmSend.style.opacity = '0.6';
@@ -808,12 +873,15 @@ if (btnFinalConfirmSend) {
             // Processar Envio Real
             try {
                 const dest = destinationInput ? destinationInput.value : '';
+                const finalDest = finalDestinationInput ? finalDestinationInput.value : '';
                 const response = await fetch(`${API_BASE_URL}/report`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         destination: dest,
-                        email: selectedBranchEmail
+                        finalDestination: finalDest,
+                        email: selectedBranchEmail,
+                        finalEmail: selectedFinalBranchEmail
                     })
                 });
 
@@ -829,6 +897,9 @@ if (btnFinalConfirmSend) {
 
                     loadItems();
                     if (destinationInput) destinationInput.value = '';
+                    if (finalDestinationInput) finalDestinationInput.value = '';
+                    if (fieldSelectBranch) { fieldSelectBranch.style.borderColor = '#eee'; fieldSelectBranch.style.background = '#fafafa'; }
+                    if (fieldSelectFinalBranch) { fieldSelectFinalBranch.style.borderColor = '#eee'; fieldSelectFinalBranch.style.background = '#fafafa'; }
                     if (btnConfirmSend) {
                         btnConfirmSend.disabled = true;
                         btnConfirmSend.style.opacity = '0.5';
