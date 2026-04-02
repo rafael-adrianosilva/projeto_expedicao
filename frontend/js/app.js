@@ -391,6 +391,7 @@ async function startCamera() {
     // Configuração baseada no modo selecionado
     const isQRCode = currentScanMode === 'QR';
     const config = {
+<<<<<<< HEAD
         fps: 25, // Aumentado para maior fluidez
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
@@ -411,6 +412,24 @@ async function startCamera() {
             }
         },
         aspectRatio: undefined,
+=======
+        fps: 20, // Aumentado para maior fluidez
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+            if (isQRCode) {
+                // QR: 70% da menor dimensão, limitado a um tamanho razoável
+                const size = Math.floor(minEdgeSize * 0.7);
+                return { width: size, height: size };
+            } else {
+                // Barcode: Largura maior que altura
+                const width = Math.floor(viewfinderWidth * 0.8);
+                const height = Math.floor(viewfinderHeight * 0.3);
+                const finalHeight = Math.max(height, 100); // Mínimo 100px para barcode
+                return { width: width, height: finalHeight };
+            }
+        },
+        aspectRatio: undefined, // Deixa a câmera usar sua proporção natural
+>>>>>>> 377751232134c0769beb7802873ba3bdf42d8cc4
         disableFlip: false,
         formatsToSupport: isQRCode
             ? [Html5QrcodeSupportedFormats.QR_CODE]
