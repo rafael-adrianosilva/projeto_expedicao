@@ -340,7 +340,7 @@ let currentScanMode = 'QR';
 function setScanMode(mode) {
     currentScanMode = mode;
     const scanArea = document.getElementById('scanArea');
-    
+
     if (mode === 'QR') {
         if (btnModeQR) btnModeQR.classList.add('active');
         if (btnModeBarcode) btnModeBarcode.classList.remove('active');
@@ -391,7 +391,6 @@ async function startCamera() {
     // Configuração baseada no modo selecionado
     const isQRCode = currentScanMode === 'QR';
     const config = {
-<<<<<<< HEAD
         fps: 25, // Aumentado para maior fluidez
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
@@ -407,12 +406,12 @@ async function startCamera() {
                 const widthFactor = isLandscape ? 0.7 : 0.85;
                 const width = Math.floor(viewfinderWidth * widthFactor);
                 const height = Math.floor(viewfinderHeight * (isLandscape ? 0.25 : 0.3));
-                const finalHeight = Math.max(height, 80); 
+                const finalHeight = Math.max(height, 80);
                 return { width: width, height: finalHeight };
             }
         },
         aspectRatio: undefined,
-=======
+
         fps: 20, // Aumentado para maior fluidez
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
@@ -429,7 +428,7 @@ async function startCamera() {
             }
         },
         aspectRatio: undefined, // Deixa a câmera usar sua proporção natural
->>>>>>> 377751232134c0769beb7802873ba3bdf42d8cc4
+
         disableFlip: false,
         formatsToSupport: isQRCode
             ? [Html5QrcodeSupportedFormats.QR_CODE]
@@ -717,7 +716,7 @@ if (btnSendEmail) {
 if (fieldSelectBranch) {
     fieldSelectBranch.addEventListener('click', () => {
         activeDestinationField = 'main';
-        
+
         // Atualiza ícone e título do modal para Destino Normal
         const modalIcon = document.getElementById('branchModalIcon');
         const modalTitle = document.getElementById('branchModalTitle');
@@ -734,7 +733,7 @@ if (fieldSelectBranch) {
 if (fieldSelectFinalBranch) {
     fieldSelectFinalBranch.addEventListener('click', () => {
         activeDestinationField = 'final';
-        
+
         // Atualiza ícone e título do modal para Destino Final
         const modalIcon = document.getElementById('branchModalIcon');
         const modalTitle = document.getElementById('branchModalTitle');
