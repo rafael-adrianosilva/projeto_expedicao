@@ -799,7 +799,8 @@ body {
 
 /* scan-area responsivo com min() */
 .scan-area {
-    width: min(75vw, 75vh, 280px);
+    width: 70vmin;
+    max-width: 300px;
     aspect-ratio: 1 / 1;
     border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 20px;
@@ -814,9 +815,10 @@ body {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Modo Código de Barras (Retangular Proporcional) */
+/* Modo Código de Barras (Retangular Blindado) */
 .scan-area.barcode-mode {
-    width: min(85vw, 85vh, 450px);
+    width: 85vmin;
+    max-width: 500px;
     aspect-ratio: 2.5 / 1;
     height: auto !important;
 }
@@ -829,7 +831,7 @@ body {
     position: absolute;
     width: 40px;
     height: 40px;
-    border-color: var(--primary-red);
+    border-color: #fff;
     border-style: solid;
     z-index: 2;
 }
@@ -867,28 +869,6 @@ body {
     border-width: 0 4px 4px 0;
     border-bottom-right-radius: 16px;
 }
-
-.scan-line {
-    width: 100%;
-    height: 2px;
-    background: var(--primary-red);
-    box-shadow: 0 0 10px 2px var(--primary-red);
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    animation: scan 2.5s infinite linear alternate;
-}
-
-@keyframes scan {
-    0% {
-        top: 0;
-    }
-
-    100% {
-        top: 100%;
-    }
-}
-
 .camera-instruction {
     color: rgba(255, 255, 255, 0.9);
     margin-top: 24px;

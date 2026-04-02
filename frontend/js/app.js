@@ -511,17 +511,27 @@ const restartScanner = async () => {
         clearTimeout(resizeTimer);
         // Delay de 400ms para garantir que o navegador termine a transição de rotação
         resizeTimer = setTimeout(async () => {
-            console.log("Forçando reinício total do scanner após mudança de orientação...");
+            console.log("Limpando DOM e forçando reinício total do scanner...");
             if (html5QrCode) {
                 try {
                     if (html5QrCode.isScanning) {
                         await html5QrCode.stop();
                     }
-                    html5QrCode.clear();
                 } catch (e) {
-                    console.warn("Erro ao limpar scanner na rotação:", e);
+                    console.warn("Erro ao parar scanner:", e);
                 }
                 html5QrCode = null;
+            }
+            // Limpa o container e qualquer estilo inline que a biblioteca tenha injetado
+            const reader = document.getElementById('reader');
+            if (reader) {
+                reader.innerHTML = '';
+                reader.removeAttribute('style');
+                // Reaplica estilos base necessários
+                reader.style.width = '100%';
+                reader.style.position = 'relative';
+                reader.style.flex = '1';
+                reader.style.background = '#000';
             }
             await startCamera();
         }, 400); 
