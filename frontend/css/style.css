@@ -193,6 +193,10 @@ body {
     pointer-events: none;
 }
 
+#qrbox {
+    aspect-ratio: 1 / 1;
+}
+
 .splash-btn {
     opacity: 0;
     visibility: hidden;
@@ -795,25 +799,26 @@ body {
 
 /* scan-area responsivo com min() */
 .scan-area {
-    width: min(260px, 70vw);
-    height: min(260px, 70vw);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
+    width: min(280px, 75vw, 65vh);
+    aspect-ratio: 1 / 1;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     z-index: 100;
     pointer-events: none;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ajuste para o modo Código de Barras (mais largo) */
+/* Ajuste para o modo Código de Barras (Retangular Horizontal) */
 .scan-area.barcode-mode {
-    width: min(450px, 85vw);
-    height: min(150px, 30vh);
+    width: min(500px, 85vw);
+    aspect-ratio: 3 / 1.2;
+    height: auto; /* Deixa o aspect-ratio mandar */
 }
 
 .scan-area::before,
@@ -1381,7 +1386,8 @@ body {
     box-shadow: none !important;
     overflow: hidden;
     position: relative;
-    flex: 1; /* Garante que ocupe o espaço disponível */
+    flex: 1;
+    /* Garante que ocupe o espaço disponível */
 }
 
 #reader video {
@@ -1424,25 +1430,26 @@ body {
     #cameraModal .modal-header {
         padding: 8px 16px;
     }
-    
+
     .mode-toggle-container {
         margin-bottom: 5px;
     }
-    
+
     .mode-toggle-track {
         transform: scale(0.85);
         margin: -5px 0;
     }
-    
+
     .camera-instruction {
-        display: none !important; /* Ganha espaço vertical */
+        display: none !important;
+        /* Ganha espaço vertical */
     }
-    
+
     .modal-controls {
         margin-top: 5px;
         margin-bottom: 5px;
     }
-    
+
     .btn-capture {
         padding: 8px 24px;
         font-size: 13px;
