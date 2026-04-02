@@ -799,7 +799,7 @@ body {
 
 /* scan-area responsivo com min() */
 .scan-area {
-    width: min(280px, 75vw, 65vh);
+    width: min(75vw, 75vh, 280px);
     aspect-ratio: 1 / 1;
     border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 20px;
@@ -807,18 +807,18 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     z-index: 100;
     pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Ajuste para o modo Código de Barras (Retangular Horizontal) */
+/* Modo Código de Barras (Retangular Proporcional) */
 .scan-area.barcode-mode {
-    width: min(500px, 85vw);
-    aspect-ratio: 3 / 1.2;
-    height: auto; /* Deixa o aspect-ratio mandar */
+    width: min(85vw, 85vh, 450px);
+    aspect-ratio: 2.5 / 1;
+    height: auto !important;
 }
 
 .scan-area::before,
@@ -1426,39 +1426,33 @@ body {
 }
 
 /* ---- Ajustes para Orientação Paisagem (Tablet/Mobile) ---- */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) {
     #cameraModal .modal-header {
-        padding: 8px 16px;
+        padding: 5px 16px;
+        min-height: 40px;
     }
 
     .mode-toggle-container {
-        margin-bottom: 5px;
+        margin-bottom: 2px;
     }
 
     .mode-toggle-track {
-        transform: scale(0.85);
-        margin: -5px 0;
+        transform: scale(0.8);
+        margin: -8px 0;
     }
 
     .camera-instruction {
         display: none !important;
-        /* Ganha espaço vertical */
     }
 
     .modal-controls {
-        margin-top: 5px;
-        margin-bottom: 5px;
+        padding: 8px;
+        margin: 0;
     }
 
     .btn-capture {
-        padding: 8px 24px;
+        padding: 6px 20px;
         font-size: 13px;
-    }
-
-    /* Reduz área de scan em telas muito baixas */
-    .scan-area:not(.barcode-mode) {
-        width: min(180px, 60vh);
-        height: min(180px, 60vh);
     }
 }
 

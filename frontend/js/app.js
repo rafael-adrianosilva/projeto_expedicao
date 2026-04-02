@@ -393,20 +393,18 @@ async function startCamera() {
     const config = {
         fps: 25,
         qrbox: (viewfinderWidth, viewfinderHeight) => {
+            // Sincroniza com o CSS: min(75vw, 75vh, 280px) ou (85vw, 85vh, 500px)
             const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
             
             if (isQRCode) {
-                // QR Code: Sempre quadrado, ocupando no máximo 75% da menor dimensão
-                const size = Math.floor(minEdge * 0.75);
+                // QR: Quadrado perfeito (75% da menor borda, limitado a 280px)
+                const size = Math.floor(Math.min(minEdge * 0.75, 280));
                 return { width: size, height: size };
             } else {
-                // Código de Barras: Retângulo horizontal (padrão tablet)
-                // Largura: 85% do viewport ou até 500px / Altura: 30% da altura ou pelo menos 100px
-                const width = Math.floor(viewfinderWidth * 0.85);
-                const height = Math.floor(viewfinderHeight * 0.3);
-                const finalWidth = Math.min(width, 500);
-                const finalHeight = Math.max(height, 100);
-                return { width: finalWidth, height: finalHeight };
+                // Barcode: Retângulo horizontal (85% da menor borda ou até 450px)
+                const width = Math.floor(Math.min(viewfinderWidth * 0.85, 450));
+                const height = Math.floor(width / 2.5); // Segue o aspect-ratio 2.5 / 1 do CSS
+                return { width: width, height: height };
             }
         },
         aspectRatio: undefined,
@@ -508,15 +506,18 @@ if (btnSwitchCamera) {
 
 // listener para redimensionamento e orientação - Garante que a "parte branca" volte
 let resizeTimer;
-window.addEventListener('resize', () => {
+const restartScanner = async () => {
     if (cameraModal && cameraModal.style.display === 'flex') {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(async () => {
-            console.log("Redimensionamento detectado, reiniciando scanner...");
+            console.log("Reiniciando scanner devido a mudança de tela/orientação...");
             await startCamera();
-        }, 500); // 500ms de debounce para esperar a rotação terminar
+        }, 600); // 600ms de debounce para esperar a rotação terminar
     }
-});
+};
+
+window.addEventListener('resize', restartScanner);
+window.addEventListener('orientationchange', restartScanner);
 
 
 // --- Lógica da Sidebar ---
