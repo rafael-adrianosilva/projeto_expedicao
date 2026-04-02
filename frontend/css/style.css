@@ -1390,10 +1390,14 @@ body {
     /* Garante que ocupe o espaço disponível */
 }
 
-#reader video {
+#reader video,
+#reader canvas {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     border-radius: 0 !important;
 }
 

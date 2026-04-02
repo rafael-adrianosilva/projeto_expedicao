@@ -509,10 +509,22 @@ let resizeTimer;
 const restartScanner = async () => {
     if (cameraModal && cameraModal.style.display === 'flex') {
         clearTimeout(resizeTimer);
+        // Delay de 400ms para garantir que o navegador termine a transição de rotação
         resizeTimer = setTimeout(async () => {
-            console.log("Reiniciando scanner devido a mudança de tela/orientação...");
+            console.log("Forçando reinício total do scanner após mudança de orientação...");
+            if (html5QrCode) {
+                try {
+                    if (html5QrCode.isScanning) {
+                        await html5QrCode.stop();
+                    }
+                    html5QrCode.clear();
+                } catch (e) {
+                    console.warn("Erro ao limpar scanner na rotação:", e);
+                }
+                html5QrCode = null;
+            }
             await startCamera();
-        }, 600); // 600ms de debounce para esperar a rotação terminar
+        }, 400); 
     }
 };
 
