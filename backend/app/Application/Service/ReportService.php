@@ -16,7 +16,7 @@ class ReportService
         $this->emailSender = $emailSender;
     }
 
-    public function sendReport(string $email): void
+    public function sendReport(string $email, string $finalEmail, string $destinationName, string $finalDestinationName): void
     {
         $items = $this->repository->findAll();
 
@@ -24,7 +24,12 @@ class ReportService
             throw new \Exception("Nenhum item recolhido para enviar.");
         }
 
-        $body = "Relatório de Coleta de Dados - Fachini Logística\n\n";
+        $body = "Relatório de Coleta de Dados - Facchini Logística\n\n";
+        $body .= "RESUMO DO TRAJETO:\n";
+        $body .= "-----------------------------------\n";
+        $body .= "1. DESTINO DA CARGA: " . $destinationName . "\n";
+        $body .= "2. DESTINO FINAL DO PRODUTO: " . $finalDestinationName . "\n\n";
+        $body .= "-----------------------------------\n";
         $body .= "Data: " . date('d/m/Y H:i:s') . "\n";
         $body .= "Total de volumes: " . count($items) . "\n\n";
         $body .= "===================================\n";
@@ -35,25 +40,42 @@ class ReportService
             $body .= $item->getCode() . "\t\t" . $item->getTimestamp()->format('d/m/Y H:i:s') . "\n";
         }
 
-        // ABAIXO O SISTEMA ENVIA PARA O GMAIL VINCULADO À FILIAL SELECIONADA
+        // 1. Envio para o Destino Intermediário
         try {
             $this->emailSender->send(
                 $email,
-                'Coleta de Dados - ' . date('d/m/Y'),
+                'Coleta (Destino) - ' . date('d/m/Y'),
                 $body
             );
         } catch (\Exception $e) {
-            // Se falhar o primeiro, ainda tentamos o de teste?
-            // Para garantir que pelo menos o de teste receba se o da filial estiver errado.
-            error_log("Erro ao enviar para a filial: " . $e->getMessage());
+            error_log("Erro ao enviar para o destino intermediário: " . $e->getMessage());
         }
 
-        // ENVIO PARA O EMAIL DE TESTE (CONFORME SOLICITADO)
-        $this->emailSender->send(
-            'joao.p.pereira73@aluno.senai.br',
-            '[TESTE] Coleta de Dados - ' . date('d/m/Y'),
-            $body
-        );
+        // 2. Envio para o Destino Final
+        if ($finalEmail !== $email) {
+            try {
+                $this->emailSender->send(
+                    $finalEmail,
+                    'Coleta (Destino Final) - ' . date('d/m/Y'),
+                    $body
+                );
+            } catch (\Exception $e) {
+                error_log("Erro ao enviar para o destino final: " . $e->getMessage());
+            }
+        }
+
+        // 3. Envio de Cópia de Segurança (Apenas se não for um dos destinos principais)
+        if ($email !== 'joao.p.pereira73@aluno.senai.br' && $finalEmail !== 'joao.p.pereira73@aluno.senai.br') {
+            try {
+                $this->emailSender->send(
+                    'joao.p.pereira73@aluno.senai.br',
+                    '[CÓPIA] Coleta de Dados - ' . date('d/m/Y'),
+                    $body
+                );
+            } catch (\Exception $e) {
+                error_log("Erro ao enviar cópia de segurança: " . $e->getMessage());
+            }
+        }
 
         $this->repository->deleteAll();
     }

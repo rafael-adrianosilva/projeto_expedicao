@@ -1,13 +1,13 @@
 /* ============================================================
-   FACHINI QRCode — CSS Responsivo (Mobile-First)
+   FACCHINI QRCode — CSS Responsivo (Mobile-First)
    Breakpoints: <360px | 360-480px | 481-1024px | >1024px
    ============================================================ */
 
 :root {
-    --fachini-blue: #D32F2F;
-    --fachini-blue-hover: #B71C1C;
-    --fachini-orange: #F26522;
-    --fachini-orange-hover: #D9531E;
+    --facchini-blue: #D32F2F;
+    --facchini-blue-hover: #B71C1C;
+    --facchini-orange: #F26522;
+    --facchini-orange-hover: #D9531E;
     --bg-light: #F4F6F8;
     --text-dark: #333333;
     --text-muted: #777777;
@@ -267,6 +267,8 @@ body {
     100% {
         opacity: 0;
         visibility: hidden;
+        z-index: -999;
+        /* Parafal que fez sumir o splash screen */
     }
 }
 
@@ -303,7 +305,7 @@ body {
 
 /* ---- Header ---- */
 .header {
-    background-color: var(--fachini-blue);
+    background-color: var(--facchini-blue);
     color: var(--white);
     padding: 16px;
     display: flex;
@@ -367,11 +369,11 @@ body {
 }
 
 #codeInput:focus {
-    border-color: var(--fachini-orange);
+    border-color: var(--facchini-orange);
 }
 
 .btn-scan {
-    background-color: var(--fachini-blue);
+    background-color: var(--facchini-blue);
     color: var(--white);
     border: none;
     border-radius: 8px;
@@ -385,7 +387,7 @@ body {
 }
 
 .btn-scan:hover {
-    background-color: var(--fachini-blue-hover);
+    background-color: var(--facchini-blue-hover);
 }
 
 /* ---- List Section ---- */
@@ -413,7 +415,7 @@ body {
 }
 
 .badge-count {
-    background: var(--fachini-blue);
+    background: var(--facchini-blue);
     color: var(--white);
     padding: 2px 8px;
     border-radius: 12px;
@@ -464,7 +466,7 @@ body {
 .item-code {
     font-size: clamp(13px, 3.5vw, 16px);
     font-weight: 600;
-    color: var(--fachini-blue);
+    color: var(--facchini-blue);
     font-family: monospace;
     word-break: break-all;
     display: flex;
@@ -653,7 +655,7 @@ body {
 
 /* Estilização dos textos e ícones dentro do modal */
 .confirm-icon {
-    color: var(--fachini-orange);
+    background-color: var(--facchini-orange);
     margin-bottom: 8px;
 }
 
@@ -735,7 +737,7 @@ body {
     border-radius: 12px;
     padding: 4px;
     width: 280px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .mode-toggle-slider {
@@ -746,7 +748,7 @@ body {
     height: calc(100% - 8px);
     background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 1;
 }
@@ -1308,9 +1310,9 @@ body {
 }
 
 .filter-chip.active {
-    background: var(--fachini-blue);
+    background: var(--facchini-blue);
     color: #fff;
-    border-color: var(--fachini-blue);
+    border-color: var(--facchini-blue);
 }
 
 .branch-item {
@@ -1362,12 +1364,12 @@ body {
     background: #000;
     width: 100% !important;
     max-width: 100% !important;
-    aspect-ratio: 1 / 1;
     margin: 0 auto !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     overflow: hidden;
     position: relative;
+    flex: 1; /* Garante que ocupe o espaço disponível */
 }
 
 #reader video {
@@ -1378,9 +1380,7 @@ body {
 }
 
 /* Força a região de escaneamento a ser quadrada */
-#qr-shaded-region {
-    aspect-ratio: 1 / 1 !important;
-}
+
 
 #reader__status_span {
     display: none !important;
@@ -1426,14 +1426,19 @@ body {
 }
 
 @keyframes glowModal {
-    from { box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3); }
-    to { box-shadow: 0 40px 90px rgba(211, 47, 47, 0.2); }
+    from {
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    to {
+        box-shadow: 0 40px 90px rgba(211, 47, 47, 0.2);
+    }
 }
 
 #fallbackCode {
     font-size: 32px !important;
     font-weight: 900 !important;
-    color: var(--fachini-blue);
+    color: var(--facchini-blue);
     line-height: 1.1;
     margin-top: 10px;
 }
@@ -1451,15 +1456,21 @@ body {
     width: 40px;
     height: 40px;
     border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: var(--fachini-blue);
+    border-left-color: var(--facchini-blue);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
-}@keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Tabela de Confirmação de Envio */
@@ -1497,7 +1508,7 @@ body {
 }
 
 .btn-expand-img {
-    background: var(--fachini-blue);
+    background: var(--facchini-blue);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1509,7 +1520,8 @@ body {
     align-items: center;
     gap: 8px;
     width: fit-content;
-    align-self: flex-end; /* Alinha à direita no contêiner flex pai */
+    align-self: flex-end;
+    /* Alinha à direita no contêiner flex pai */
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -1517,7 +1529,7 @@ body {
 }
 
 .btn-expand-img:hover {
-    background: var(--fachini-red);
+    background: var(--facchini-red);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(211, 47, 47, 0.2);
 }

@@ -387,9 +387,22 @@ async function startCamera() {
     // Configuração baseada no modo selecionado
     const isQRCode = currentScanMode === 'QR';
     const config = {
-        fps: 10,
-        qrbox: isQRCode ? { width: 250, height: 250 } : { width: 300, height: 150 },
-        aspectRatio: 1.0,
+        fps: 20, // Aumentado para maior fluidez
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+            if (isQRCode) {
+                // QR: 70% da menor dimensão, limitado a um tamanho razoável
+                const size = Math.floor(minEdgeSize * 0.7);
+                return { width: size, height: size };
+            } else {
+                // Barcode: Largura maior que altura
+                const width = Math.floor(viewfinderWidth * 0.8);
+                const height = Math.floor(viewfinderHeight * 0.3);
+                const finalHeight = Math.max(height, 100); // Mínimo 100px para barcode
+                return { width: width, height: finalHeight };
+            }
+        },
+        aspectRatio: undefined, // Deixa a câmera usar sua proporção natural
         disableFlip: false,
         formatsToSupport: isQRCode
             ? [Html5QrcodeSupportedFormats.QR_CODE]
@@ -486,6 +499,18 @@ if (btnSwitchCamera) {
     });
 }
 
+// listener para redimensionamento e orientação - Garante que a "parte branca" volte
+let resizeTimer;
+window.addEventListener('resize', () => {
+    if (cameraModal && cameraModal.style.display === 'flex') {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(async () => {
+            console.log("Redimensionamento detectado, reiniciando scanner...");
+            await startCamera();
+        }, 500); // 500ms de debounce para esperar a rotação terminar
+    }
+});
+
 
 // --- Lógica da Sidebar ---
 function openSidebar() {
@@ -556,10 +581,10 @@ if (btnConfirmClear) {
     });
 }
 
-// --- Dados das Filiais Fachini ---
+// --- Dados das Filiais Facchini ---
 // ABAIXO VOCÊ PODE ALTERAR O E-MAIL DE CADA FILIAL. 
 // Certifique-se de manter o formato { name: '...', location: '...', state: '...', email: '...' }
-// --- Dados das Filiais Fachini ---
+// --- Dados das Filiais Facchini ---
 // (Lista de filiais e selectedBranchEmail movidos para config.js por questões de privacidade)
 
 // Elementos dos Modais de Destino
@@ -567,12 +592,26 @@ const destinationModal = document.getElementById('destinationModal');
 const branchSelectionModal = document.getElementById('branchSelectionModal');
 const fieldSelectBranch = document.getElementById('fieldSelectBranch');
 const destinationInput = document.getElementById('destinationInput');
+const fieldSelectFinalBranch = document.getElementById('fieldSelectFinalBranch');
+const finalDestinationInput = document.getElementById('finalDestinationInput');
 const btnConfirmSend = document.getElementById('btnConfirmSend');
 const btnCancelSend = document.getElementById('btnCancelSend');
 const btnCloseBranchSelection = document.getElementById('btnCloseBranchSelection');
 const branchListContainer = document.getElementById('branchList');
 const filterStatesContainer = document.getElementById('filterStates');
 const branchSearch = document.getElementById('branchSearch');
+
+// Controla qual campo de destino está sendo preenchido ('main' ou 'final')
+let activeDestinationField = 'main';
+
+function checkConfirmButtonState() {
+    const mainFilled = destinationInput && destinationInput.value.trim() !== '';
+    const finalFilled = finalDestinationInput && finalDestinationInput.value.trim() !== '';
+    if (btnConfirmSend) {
+        btnConfirmSend.disabled = !(mainFilled && finalFilled);
+        btnConfirmSend.style.opacity = (mainFilled && finalFilled) ? '1' : '0.5';
+    }
+}
 
 let selectedState = null;
 
@@ -595,12 +634,25 @@ window.filterByState = (state) => {
 
 window.selectBranch = (branchName) => {
     const branch = branches.find(b => b.name === branchName);
-    destinationInput.value = branchName;
-    selectedBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
 
-    btnConfirmSend.disabled = false;
-    btnConfirmSend.style.opacity = '1';
+    if (activeDestinationField === 'final') {
+        if (finalDestinationInput) finalDestinationInput.value = branchName;
+        selectedFinalBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
+        if (fieldSelectFinalBranch) {
+            fieldSelectFinalBranch.style.borderColor = '#1565C0';
+            fieldSelectFinalBranch.style.background = '#e8f0fe';
+        }
+    } else {
+        if (destinationInput) destinationInput.value = branchName;
+        selectedBranchEmail = branch ? branch.email : 'elsalvadorrafa3@gmail.com';
+        if (fieldSelectBranch) {
+            fieldSelectBranch.style.borderColor = 'var(--facchini-orange)';
+            fieldSelectBranch.style.background = '#fff8f0';
+        }
+    }
+
     branchSelectionModal.style.display = 'none';
+    checkConfirmButtonState();
 };
 
 // Função para renderizar lista de filiais
@@ -637,6 +689,35 @@ if (btnSendEmail) {
 
 if (fieldSelectBranch) {
     fieldSelectBranch.addEventListener('click', () => {
+        activeDestinationField = 'main';
+        
+        // Atualiza ícone e título do modal para Destino Normal
+        const modalIcon = document.getElementById('branchModalIcon');
+        const modalTitle = document.getElementById('branchModalTitle');
+        if (modalIcon) modalIcon.setAttribute('data-lucide', 'map-pin');
+        if (modalTitle) modalTitle.textContent = 'Selecionar Filial';
+        lucide.createIcons();
+
+        if (branchSelectionModal) branchSelectionModal.style.display = 'flex';
+        renderFilterStates();
+        renderBranchList();
+    });
+}
+
+if (fieldSelectFinalBranch) {
+    fieldSelectFinalBranch.addEventListener('click', () => {
+        activeDestinationField = 'final';
+        
+        // Atualiza ícone e título do modal para Destino Final
+        const modalIcon = document.getElementById('branchModalIcon');
+        const modalTitle = document.getElementById('branchModalTitle');
+        if (modalIcon) {
+            modalIcon.setAttribute('data-lucide', 'flag');
+            modalIcon.style.color = '#1565C0'; // Azul
+        }
+        if (modalTitle) modalTitle.textContent = 'Selecionar Destino Final';
+        lucide.createIcons();
+
         if (branchSelectionModal) branchSelectionModal.style.display = 'flex';
         renderFilterStates();
         renderBranchList();
@@ -653,6 +734,9 @@ if (btnCancelSend) {
     btnCancelSend.addEventListener('click', () => {
         if (destinationModal) destinationModal.style.display = 'none';
         if (destinationInput) destinationInput.value = '';
+        if (finalDestinationInput) finalDestinationInput.value = '';
+        if (fieldSelectBranch) { fieldSelectBranch.style.borderColor = '#eee'; fieldSelectBranch.style.background = '#fafafa'; }
+        if (fieldSelectFinalBranch) { fieldSelectFinalBranch.style.borderColor = '#eee'; fieldSelectFinalBranch.style.background = '#fafafa'; }
         if (btnConfirmSend) {
             btnConfirmSend.disabled = true;
             btnConfirmSend.style.opacity = '0.6';
@@ -781,12 +865,15 @@ if (btnFinalConfirmSend) {
             // Processar Envio Real
             try {
                 const dest = destinationInput ? destinationInput.value : '';
+                const finalDest = finalDestinationInput ? finalDestinationInput.value : '';
                 const response = await fetch(`${API_BASE_URL}/report`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         destination: dest,
-                        email: selectedBranchEmail
+                        finalDestination: finalDest,
+                        email: selectedBranchEmail,
+                        finalEmail: selectedFinalBranchEmail
                     })
                 });
 
@@ -802,6 +889,9 @@ if (btnFinalConfirmSend) {
 
                     loadItems();
                     if (destinationInput) destinationInput.value = '';
+                    if (finalDestinationInput) finalDestinationInput.value = '';
+                    if (fieldSelectBranch) { fieldSelectBranch.style.borderColor = '#eee'; fieldSelectBranch.style.background = '#fafafa'; }
+                    if (fieldSelectFinalBranch) { fieldSelectFinalBranch.style.borderColor = '#eee'; fieldSelectFinalBranch.style.background = '#fafafa'; }
                     if (btnConfirmSend) {
                         btnConfirmSend.disabled = true;
                         btnConfirmSend.style.opacity = '0.5';

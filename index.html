@@ -57,9 +57,8 @@
                 <i data-lucide="truck" width="24" height="24"></i>
                 <div class="smoke"></div>
             </div>
-            <img src="frontend/assets/img/logo_facchini.png" alt="Logo Facchini"
-                 class="logo-text"
-                 style="height: 22px; width: auto; filter: brightness(0) invert(1);">
+            <img src="frontend/assets/img/logo_facchini.png" alt="Logo Facchini" class="logo-text"
+                style="height: 22px; width: auto; filter: brightness(0) invert(1);">
             <button id="btnMenu" class="header-icon-right"
                 style="background:none; border:none; color:inherit; cursor:pointer; padding:0; display:flex; align-items:center;">
                 <i data-lucide="menu" width="24" height="24"></i>
@@ -189,7 +188,7 @@
                 </div>
                 <h3 class="confirm-title" style="font-size: 20px; font-weight: 700;">Limpar Tudo?</h3>
                 <p class="confirm-text">
-                    Existem <strong id="modalItemCount" style="color: var(--fachini-blue);">0</strong> itens na
+                    Existem <strong id="modalItemCount" style="color: var(--facchini-blue);">0</strong> itens na
                     lista.<br>
                     Tem certeza que deseja apagar tudo? Esta ação não pode ser desfeita.
                 </p>
@@ -199,7 +198,7 @@
                         style="background: transparent; color: var(--text-muted); font-weight: 600;">Cancelar</button>
                     <!-- Botão Continuar -->
                     <button class="btn btn-secondary" id="btnConfirmClear"
-                        style="background: var(--fachini-blue); border-radius: 12px;">Continuar</button>
+                        style="background: var(--facchini-blue); border-radius: 12px;">Continuar</button>
                 </div>
             </div>
         </div>
@@ -234,11 +233,26 @@
                 </div>
 
                 <div id="fieldSelectBranch"
-                    style="cursor: pointer; position: relative; border: 2px solid #eee; border-radius: 14px; padding: 14px 48px 14px 16px; background: #fafafa; transition: all 0.2s; text-align: left;">
-                    <input type="text" id="destinationInput" placeholder="Toque para selecionar destino" readonly
-                        style="cursor: pointer; background: transparent; border: none; outline: none; width: 100%; font-size: 14px; font-weight: 600; color: var(--text-dark);">
+                    style="cursor: pointer; position: relative; border: 2px solid #eee; border-radius: 14px; padding: 14px 16px 14px 48px; background: #fafafa; transition: all 0.2s; text-align: left;">
                     <i data-lucide="map-pin" width="20" height="20"
-                        style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--fachini-orange);"></i>
+                        style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--facchini-orange);"></i>
+                    <input type="text" id="destinationInput" placeholder="Toque para adicionar destino" readonly
+                        style="cursor: pointer; background: transparent; border: none; outline: none; width: 100%; font-size: 14px; font-weight: 600; color: var(--text-dark);">
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; margin: 2px 0;">
+                    <div style="height: 1px; flex: 1; background: #e0e0e0;"></div>
+                    <span style="font-size: 11px; color: var(--text-muted); white-space: nowrap;">destino final</span>
+                    <div style="height: 1px; flex: 1; background: #e0e0e0;"></div>
+                </div>
+
+                <div id="fieldSelectFinalBranch"
+                    style="cursor: pointer; position: relative; border: 2px solid #eee; border-radius: 14px; padding: 14px 16px 14px 48px; background: #fafafa; transition: all 0.2s; text-align: left;">
+                    <i data-lucide="flag" width="20" height="20"
+                        style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #1565C0;"></i>
+                    <input type="text" id="finalDestinationInput" placeholder="Toque para adicionar destino final"
+                        readonly
+                        style="cursor: pointer; background: transparent; border: none; outline: none; width: 100%; font-size: 14px; font-weight: 600; color: var(--text-dark);">
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -258,11 +272,12 @@
         <div class="modal-overlay" id="branchSelectionModal" style="z-index: 1010;">
             <div class="confirm-box" style="padding: 0; overflow: hidden; max-height: 80vh;">
                 <div
-                    style="background: linear-gradient(135deg, var(--fachini-blue), #B71C1C); color: white; padding: 20px 20px 14px; text-align: left;">
+                    style="background: linear-gradient(135deg, var(--facchini-blue), #B71C1C); color: white; padding: 20px 20px 14px; text-align: left;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                         <span style="font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="map-pin" width="20" height="20"></i> Selecionar Filial
+                            <i id="branchModalIcon" data-lucide="map-pin" width="20" height="20"></i>
+                            <span id="branchModalTitle">Selecionar Filial</span>
                         </span>
                         <button id="btnCloseBranchSelection"
                             style="background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -332,7 +347,8 @@
                     <h3 style="margin-bottom: 10px; color: var(--text-dark);">Confirmar Envio</h3>
                     <p style="font-size: 16px; color: var(--text-muted);">
                         Deseja enviar os itens coletados para a filial <br>
-                        <strong id="confirmBranchName" style="color: var(--fachini-red); font-size: 18px;">---</strong>?
+                        <strong id="confirmBranchName"
+                            style="color: var(--facchini-red); font-size: 18px;">---</strong>?
                     </p>
                 </div>
 

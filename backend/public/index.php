@@ -3,7 +3,7 @@ date_default_timezone_set('America/Sao_Paulo');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Infrastructure\Persistence\SQLiteCollectedItemRepository;
+use App\Infrastructure\Persistence\JsonCollectedItemRepository;
 use App\Infrastructure\Email\PHPMailerEmailSender;
 use App\Application\Service\CollectItemService;
 use App\Application\Service\ReportService;
@@ -47,7 +47,7 @@ $path = rtrim($path, '/');
 if (empty($path)) $path = '/';
 
 // Setup DI (Manual for this structure)
-$repository = new SQLiteCollectedItemRepository();
+$repository = new JsonCollectedItemRepository();
 $emailSender = new PHPMailerEmailSender();
 $collectService = new CollectItemService($repository);
 $reportService = new ReportService($repository, $emailSender);
